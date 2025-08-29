@@ -25,7 +25,9 @@ public class User {
     @Indexed(unique = true)
     @NonNull
     private String userName;
+    @Indexed(unique = true)
     private String email;
+    @Indexed(unique = true)
     private String phoneNumber;
     @NonNull
     private String password;

@@ -1,4 +1,10 @@
 package com.Jyotibroto.auradrive.dto;
 
-public class AuthRequest {
+import lombok.Data;
+import lombok.RequiredArgsConstructor;
+
+@Data
+@RequiredArgsConstructor
+public class AuthResponse {
+    private final String token;
 }
