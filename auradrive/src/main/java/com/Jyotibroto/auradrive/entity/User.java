@@ -17,7 +17,6 @@ import org.springframework.stereotype.Component;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Component
 public class User {
     @Id
     private ObjectId id;
@@ -32,4 +31,5 @@ public class User {
     @NonNull
     private String password;
     private ROLES role;
+    private boolean isAvailable = true;
 }

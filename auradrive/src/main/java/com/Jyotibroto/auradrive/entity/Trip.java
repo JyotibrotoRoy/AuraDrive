@@ -19,7 +19,6 @@ import java.time.LocalDateTime;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-@Component
 public class Trip {
     @Id
     private String id;
@@ -28,5 +27,6 @@ public class Trip {
     private GeoJsonPoint startLocation;
     private GeoJsonPoint endLocation;
     private TripStatus tripStatus;
+    private String Otp;
     private LocalDateTime createdAt;
 }

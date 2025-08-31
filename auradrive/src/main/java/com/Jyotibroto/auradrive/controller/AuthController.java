@@ -24,6 +24,12 @@ public class AuthController {
         return ResponseEntity.ok("User Registered succesfully");
     }
 
+    @PostMapping("/register/driver")
+    public ResponseEntity<?> registerDriver(@RequestBody User user) {
+        authService.registerDriver(user);
+        return ResponseEntity.ok("Driver Registered successfully");
+    }
+
     @PostMapping("/login")
     public ResponseEntity<AuthResponse> loginUser(@RequestBody AuthRequest authRequest) {
         String token = authService.login(authRequest);

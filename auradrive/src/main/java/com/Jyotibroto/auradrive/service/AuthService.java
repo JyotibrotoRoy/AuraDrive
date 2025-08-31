@@ -14,6 +14,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @Slf4j
@@ -35,9 +36,10 @@ public class AuthService {
         this.passwordEncoder = passwordEncoder;
     }
 
+    @Transactional
     public User registerNewUser(User user) {
         if(userRepository.findByEmail(user.getEmail()).isPresent()) {
-            throw new IllegalStateException("Error: A user with this email already exists.");
+            throw new IllegalStateException("Error: A user with this email already exists");
         }
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         user.setRole(ROLES.RIDER);
@@ -47,7 +49,25 @@ public class AuthService {
             return savedUser;
         }catch (DataIntegrityViolationException e) {
             log.error("Database error while registering new user with email id: {}. error: {}", user.getEmail(), e.getMessage());
-            throw new IllegalStateException("Error: this phone number may already be in use");
+            throw new IllegalStateException("Error: this phone number or email may already be in use");
+        }
+    }
+
+    @Transactional
+    public User registerDriver(User user) {
+        if(userRepository.findByEmail(user.getEmail()).isPresent()) {
+            throw new IllegalStateException("Error: A user with this email already exists");
+        }
+
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
+        user.setRole(ROLES.DRIVER);
+        try{
+            User savedUser = userRepository.save(user);
+            log.info("Successfully registered new driver with email id: {}", savedUser.getEmail());
+            return savedUser;
+        }catch (DataIntegrityViolationException e){
+            log.error("Database error while registering new driver with email id: {}. error: {}", user.getEmail(), e.getMessage());
+            throw new IllegalStateException("Error: this phone number or email may already be in use");
         }
     }
 
