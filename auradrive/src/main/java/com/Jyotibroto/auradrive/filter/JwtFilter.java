@@ -2,6 +2,7 @@ package com.Jyotibroto.auradrive.filter;
 
 import com.Jyotibroto.auradrive.service.UserDetailsServiceImpl;
 import com.Jyotibroto.auradrive.util.JwtUtil;
+import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -27,20 +28,32 @@ public class JwtFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-        String authorizationHeader = request.getHeader("Authorization");
-        String userName = null;
-        String jwt = null;
-        if(authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
-            jwt = authorizationHeader.substring(7);
-            userName = jwtUtil.extractUserName(jwt);
+        final String authorizationHeader = request.getHeader("Authorization");
+        final String userName;
+        final String jwt;
+        if(authorizationHeader == null || !authorizationHeader.startsWith("Bearer ")) {
+            filterChain.doFilter(request, response);
+            return;
         }
-        if(userName != null) {
-            UserDetails userDetails =userDetailsService.loadUserByUsername(userName);
-            if(jwtUtil.validateToken(jwt)) {
-                UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+        jwt = authorizationHeader.substring(7);
+        try {
+            userName = jwtUtil.extractUserName(jwt);
+        if(userName != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+            UserDetails userDetails = this.userDetailsService.loadUserByUsername(userName);
+            if(jwtUtil.validateToken(jwt, userDetails)) {
+                UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(
+                        userDetails,
+                        null,
+                        userDetails.getAuthorities());
                 auth.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                 SecurityContextHolder.getContext().setAuthentication(auth);
+                }
             }
+        }catch (ExpiredJwtException e) {
+            logger.warn("JWT token has expired ", e);
+        }
+        catch (Exception e) {
+            logger.error("Error during JWT validation: ", e);
         }
         filterChain.doFilter(request, response);
     }
