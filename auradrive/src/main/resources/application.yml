@@ -23,3 +23,7 @@ spring:
 s3:
   bucket:
     name: auradrive-documents-roy
+
+jwt:
+    secret:
+        key: "TaK+HaV^uvCHEFsEVfypW#7g9^k*Z8$V"
