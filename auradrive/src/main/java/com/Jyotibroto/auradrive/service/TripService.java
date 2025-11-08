@@ -5,9 +5,11 @@ import com.Jyotibroto.auradrive.dto.TripRequestDto;
 import com.Jyotibroto.auradrive.dto.TripResponseDto;
 import com.Jyotibroto.auradrive.entity.Trip;
 import com.Jyotibroto.auradrive.entity.User;
+import com.Jyotibroto.auradrive.enums.AccountStatus;
 import com.Jyotibroto.auradrive.enums.TripStatus;
 import com.Jyotibroto.auradrive.repository.TripRepository;
 import com.Jyotibroto.auradrive.repository.UserRepository;
+import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.geo.GeoJsonPoint;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
@@ -15,10 +17,13 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.text.DecimalFormat;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Random;
+import java.util.stream.Collectors;
 
 @Service
 public class TripService {
@@ -33,9 +38,11 @@ public class TripService {
 
     @Autowired
     private SimpMessagingTemplate simpMessagingTemplate;
+    @Autowired
+    private FareService fareService;
 
 
-        public TripResponseDto createTrip(TripRequestDto request, UserDetails riderDetails) {
+    public TripResponseDto createTrip(TripRequestDto request, UserDetails riderDetails) {
             User rider = userRepository.findByEmail(riderDetails.getUsername())
                     .orElseThrow(() -> new UsernameNotFoundException("Rider not found"));
 
@@ -46,8 +53,10 @@ public class TripService {
             trip.setTripStatus(TripStatus.REQUESTED);
             trip.setCreatedAt(LocalDateTime.now());
 
+            trip.setVehicleType(request.getVehicleType());
 
             TripResponseDto response = new TripResponseDto();
+            response.setVehicleType(trip.getVehicleType());
             Trip savedTrip = tripRepository.save(trip);
 
             LocationDto start = new LocationDto();
@@ -78,6 +87,10 @@ public class TripService {
 
             User driver = userRepository.findByEmail(driverDetails.getUsername())
                     .orElseThrow(() -> new UsernameNotFoundException("Driver not found"));
+
+            if(driver.getAccountStatus() != AccountStatus.ACCEPTED) {
+                throw new SecurityException("Your account is not approved to be accepted");
+            }
 
             String otp = new DecimalFormat("0000").format(new Random().nextInt(9999));
             trip.setOtp(passwordEncoder.encode(otp));
@@ -142,6 +155,7 @@ public class TripService {
             }
 
             trip.setTripStatus(TripStatus.IN_PROGRESS);
+            trip.setCreatedAt(LocalDateTime.now());
             Trip updatedTrip = tripRepository.save(trip);
 
             simpMessagingTemplate.convertAndSend("/topic/trip/" + tripId, mapToTripResponseDto(updatedTrip));
@@ -149,6 +163,7 @@ public class TripService {
             return mapToTripResponseDto(updatedTrip);
         }
 
+        @Transactional
         public TripResponseDto endTrip(String tripId, UserDetails driverDetails) {
             Trip trip = tripRepository.findById(tripId)
                     .orElseThrow(() -> new RuntimeException("Trip not found"));
@@ -163,6 +178,10 @@ public class TripService {
             if(trip.getTripStatus() != TripStatus.IN_PROGRESS) {
                 throw new IllegalStateException("Trip must be in progress to be ended.");
             }
+
+            trip.setEndedAt(LocalDateTime.now());
+            double finalFare = fareService.calculateFare(trip);
+            trip.setFinalFare(finalFare);// Placeholder for fare calculation logic
 
             driver.setAvailable(true);
             userRepository.save(driver);
@@ -200,5 +219,17 @@ public class TripService {
             response.setEndLocation(end);
 
             return response;
+        }
+
+        public List<TripResponseDto> getTripHistory(UserDetails userDetails) {
+        User user = userRepository.findByEmail(userDetails.getUsername())
+                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+            ObjectId userId = user.getId();
+
+        List<Trip> trips = tripRepository.findTop5ByRiderIdOrderByCreatedAtDesc(userId, userId);
+
+        return trips.stream()
+                .map(this::mapToTripResponseDto)
+                .collect(Collectors.toList());
         }
 }

@@ -21,7 +21,7 @@ public class RiderController {
 
     @PostMapping("/nearby")
     public ResponseEntity<List<NearbyDriversResponseDto>> findNearByDrivers(@RequestBody FindDriverRequestDto request) {
-        List<NearbyDriversResponseDto> drivers = driverService.findNearByDrivers(request.getCurrentLocation());
+        List<NearbyDriversResponseDto> drivers = driverService.findNearByDrivers(request.getCurrentLocation(), request.getVehicleType());
         return ResponseEntity.ok(drivers);
     }
 

@@ -2,8 +2,11 @@ package com.Jyotibroto.auradrive.controller;
 
 import com.Jyotibroto.auradrive.dto.AuthRequest;
 import com.Jyotibroto.auradrive.dto.AuthResponse;
+import com.Jyotibroto.auradrive.dto.DriverRegistrationRequestDto;
+import com.Jyotibroto.auradrive.dto.RiderRegistrationDto;
 import com.Jyotibroto.auradrive.entity.User;
 import com.Jyotibroto.auradrive.service.AuthService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,14 +22,14 @@ public class AuthController {
     private AuthService authService;
 
     @PostMapping("/register/rider")
-    public ResponseEntity<?> registerUser(@RequestBody User user){
-        authService.registerNewUser(user);
+    public ResponseEntity<?> registerUser(@Valid @RequestBody RiderRegistrationDto request) {
+        authService.registerNewUser(request);
         return ResponseEntity.ok("User Registered succesfully");
     }
 
     @PostMapping("/register/driver")
-    public ResponseEntity<?> registerDriver(@RequestBody User user) {
-        authService.registerDriver(user);
+    public ResponseEntity<?> registerDriver(@RequestBody DriverRegistrationRequestDto request) {
+        authService.registerDriver(request);
         return ResponseEntity.ok("Driver Registered successfully");
     }
 

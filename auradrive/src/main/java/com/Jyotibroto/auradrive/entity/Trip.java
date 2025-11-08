@@ -1,6 +1,7 @@
 package com.Jyotibroto.auradrive.entity;
 
 import com.Jyotibroto.auradrive.enums.TripStatus;
+import com.Jyotibroto.auradrive.enums.VehicleType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -29,4 +30,10 @@ public class Trip {
     private TripStatus tripStatus;
     private String Otp;
     private LocalDateTime createdAt;
+
+    private VehicleType vehicleType;
+    private String vehicleNumber;
+    private double finalFare;
+    private LocalDateTime startedAt;
+    private LocalDateTime endedAt;
 }

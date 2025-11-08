@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="dataSourceStorageLocal" created-in="IU-252.26830.84">
+    <data-source name="AuraDB@cluster0.g0u0zvg.mongodb.net" uuid="c8dd2407-80ce-4f95-b361-a60711b9fbc8">
+      <database-info product="" version="" jdbc-version="" driver-name="" driver-version="" dbms="MONGO" />
+      <user-name>jyotibroto</user-name>
+      <schema-mapping />
+    </data-source>
+    <data-source name="0@localhost" uuid="97f2ece6-70d8-467b-97e6-3888cce3fcd9">
+      <database-info product="" version="" jdbc-version="" driver-name="" driver-version="" dbms="REDIS" />
+      <schema-mapping />
+    </data-source>
+  </component>
+</project>

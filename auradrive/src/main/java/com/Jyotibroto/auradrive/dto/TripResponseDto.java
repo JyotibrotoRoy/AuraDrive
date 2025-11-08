@@ -1,6 +1,7 @@
 package com.Jyotibroto.auradrive.dto;
 
 import com.Jyotibroto.auradrive.enums.TripStatus;
+import com.Jyotibroto.auradrive.enums.VehicleType;
 import lombok.Data;
 import org.bson.types.ObjectId;
 
@@ -16,4 +17,9 @@ public class TripResponseDto {
     private TripStatus status;
     private LocalDateTime createdAt;
     private String otpForRider;
+    private double finalFare;
+    private VehicleType vehicleType;
+    private String vehicleNumber;
+    private LocalDateTime startedAt;
+    private LocalDateTime endedAt;
 }

@@ -9,4 +9,5 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class DriverStatusRequestDto {
     private boolean available;
+    private String vehicleId;
 }

@@ -1,6 +1,9 @@
 package com.Jyotibroto.auradrive.entity;
 
+import com.Jyotibroto.auradrive.POJO.DocumentInfo;
+import com.Jyotibroto.auradrive.enums.AccountStatus;
 import com.Jyotibroto.auradrive.enums.ROLES;
+import com.Jyotibroto.auradrive.enums.VehicleType;
 import com.mongodb.lang.NonNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -14,6 +17,9 @@ import org.springframework.data.mongodb.core.index.GeoSpatialIndexed;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.stereotype.Component;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Document(collection = "users")
 @Data
@@ -37,4 +43,11 @@ public class User {
     private boolean available = false;
     @GeoSpatialIndexed(type = GeoSpatialIndexType.GEO_2DSPHERE)
     private GeoJsonPoint currentLocation;
+
+    private List<String> vehicleIds = new ArrayList<>();
+    private ObjectId currentVehicleId;
+    private VehicleType currentVehicleType;
+
+    private AccountStatus accountStatus;
+    private List<DocumentInfo> documents = new ArrayList<>();
 }

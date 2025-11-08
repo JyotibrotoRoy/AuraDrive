@@ -1,9 +1,11 @@
 package com.Jyotibroto.auradrive.controller;
 
+import com.Jyotibroto.auradrive.dto.FareEstimateResponseDto;
 import com.Jyotibroto.auradrive.dto.StartTripRequestDto;
 import com.Jyotibroto.auradrive.dto.TripRequestDto;
 import com.Jyotibroto.auradrive.dto.TripResponseDto;
 import com.Jyotibroto.auradrive.enums.TripStatus;
+import com.Jyotibroto.auradrive.service.FareService;
 import com.Jyotibroto.auradrive.service.TripService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -12,12 +14,16 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/trips")
 public class TripController {
 
     @Autowired
     private TripService tripService;
+    @Autowired
+    private FareService fareService;
 
     //Create trip
     @PostMapping
@@ -58,5 +64,13 @@ public class TripController {
                                                    @AuthenticationPrincipal UserDetails driverDetails) {
         TripResponseDto response = tripService.endTrip(tripId, driverDetails);
         return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/estimate" )
+    public ResponseEntity<List<FareEstimateResponseDto>> estimateFare(@RequestBody TripRequestDto request) {
+        List<FareEstimateResponseDto> estimates = fareService.calculateEstimates(
+                request.getStartLocation(), request.getEndLocation()
+        );
+        return ResponseEntity.ok(estimates);
     }
 }

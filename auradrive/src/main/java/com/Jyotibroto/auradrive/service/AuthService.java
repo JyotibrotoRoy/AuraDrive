@@ -1,7 +1,10 @@
 package com.Jyotibroto.auradrive.service;
 
 import com.Jyotibroto.auradrive.dto.AuthRequest;
+import com.Jyotibroto.auradrive.dto.DriverRegistrationRequestDto;
+import com.Jyotibroto.auradrive.dto.RiderRegistrationDto;
 import com.Jyotibroto.auradrive.entity.User;
+import com.Jyotibroto.auradrive.enums.AccountStatus;
 import com.Jyotibroto.auradrive.enums.ROLES;
 import com.Jyotibroto.auradrive.repository.UserRepository;
 import com.Jyotibroto.auradrive.util.JwtUtil;
@@ -37,12 +40,18 @@ public class AuthService {
     }
 
     @Transactional
-    public User registerNewUser(User user) {
-        if(userRepository.findByEmail(user.getEmail()).isPresent()) {
+    public User registerNewUser(RiderRegistrationDto request) {
+        if(userRepository.findByEmail(request.getEmail()).isPresent()) {
             throw new IllegalStateException("Error: A user with this email already exists");
         }
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
+        User user = new User();
+        user.setEmail(request.getEmail());
+        user.setUserName(request.getUserName());
+        user.setPhoneNumber(request.getPhoneNumber());
+        user.setPassword(passwordEncoder.encode(request.getPassword()));
         user.setRole(ROLES.RIDER);
+        user.setAccountStatus(AccountStatus.ACCEPTED);
+        user.setAvailable(true); // Riders are always available
         try {
             User savedUser = userRepository.save(user);
             log.info("Successfully registered new user with email id: {}", savedUser.getEmail());
@@ -54,13 +63,19 @@ public class AuthService {
     }
 
     @Transactional
-    public User registerDriver(User user) {
-        if(userRepository.findByEmail(user.getEmail()).isPresent()) {
+    public User registerDriver(DriverRegistrationRequestDto request) {
+        if(userRepository.findByEmail(request.getEmail()).isPresent()) {
             throw new IllegalStateException("Error: A user with this email already exists");
         }
 
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
+        User user = new User();
+        user.setUserName(request.getUserName());
+        user.setEmail(request.getEmail());
+        user.setPhoneNumber(request.getPhoneNumber());
+        user.setPassword(passwordEncoder.encode(request.getPassword()));
         user.setRole(ROLES.DRIVER);
+        user.setAccountStatus(AccountStatus.PENDING_DOCUMENTS);
+        user.setAvailable(false);
         try{
             User savedUser = userRepository.save(user);
             log.info("Successfully registered new driver with email id: {}", savedUser.getEmail());
