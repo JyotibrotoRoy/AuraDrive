@@ -12,12 +12,10 @@ spring:
   cloud:
     aws:
       region:
-        static: ap-south-1
+        static: ${CLOUD_AWS_REGION_STATIC}
       credentials:
         access-key: ${AWS_ACCESS_KEY_ID}
         secret-key: ${AWS_SECRET_ACCESS_KEY}
-      s3:
-        region: ap-south-1
 
 
 s3:
@@ -26,4 +24,4 @@ s3:
 
 jwt:
     secret:
-        key: "TaK+HaV^uvCHEFsEVfypW#7g9^k*Z8$V"
+        key: ${JWT_SECRET_KEY}
