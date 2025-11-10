@@ -1,13 +1,13 @@
 spring:
   data:
+    redis:
+      uri: ${REDIS_URI}
+
     mongodb:
       uri: mongodb+srv://jyotibroto:r4SueinFPv8A6zou@cluster0.g0u0zvg.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0
       database: AuraDB
       auto-index-creation: true
 
-    redis:
-      host: localhost
-      port: 6379
 
   cloud:
     aws:

@@ -50,7 +50,7 @@ public class DriverService {
     }
 
     private final String DRIVER_LOCATION_KEY = "driver_locations";
-    private final String ACTIVE_VEHICLE_KEY = "driver:active_vehicle:";
+    private final String ACTIVE_VEHICLE_KEY = "driver:active_vehicle";
 
     public void updateDriverAvailability(String driverEmail, DriverStatusRequestDto request) {
         User driver = userRepository.findByEmail(driverEmail)
